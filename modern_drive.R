@@ -1,12 +1,11 @@
 install.packages("nycflights13")
-install.packages("dplyr")
-install.packages("knitr")
-install.packages("ggplot2")
+install.packages("tidyverse")
+
 
 library(nycflights13)
-library(dplyr)
-library(knitr)
-library(ggplot2)
+library(tidyverse)
+# ----------------------------
+
 
 glimpse(flights)
 str(flights)
@@ -132,3 +131,53 @@ by_origin_monthly <- flights %>%
   group_by(origin, month) %>% 
   summarize(count = n())
 by_origin_monthly
+
+
+flights <- flights %>% 
+  mutate(
+    gain = dep_delay - arr_delay,
+    hours = air_time / 60,
+    gain_per_hour = gain / hours
+  )
+str(flights)
+
+freq_dest <- flights %>% 
+  group_by(dest) %>% 
+  summarize(num_flights = n())
+freq_dest
+
+freq_dest %>% 
+  arrange(num_flights)
+
+# -------------
+
+install.packages("fivethirtyeight")
+library(fivethirtyeight)
+
+drinks_smaller <- drinks %>% 
+  filter(country %in% c("USA", "China", "Italy", "Saudi Arabia")) %>% 
+  select(-total_litres_of_pure_alcohol) %>% 
+  rename(beer = beer_servings, spirit = spirit_servings, wine = wine_servings)
+drinks_smaller
+
+drinks_smaller_tidy <- drinks_smaller %>%
+  pivot_longer(names_to = "type",
+               values_to = "servings",
+               cols = -country)
+drinks_smaller_tidy
+
+# ----- pivot_* exercise
+
+relig_income
+str(relig_income)
+
+long_data <- pivot_longer(data = relig_income,
+                          cols = -religion,
+                          names_to = 'annual_income',
+                          values_to = 'freq')
+long_data
+
+wide_data <- pivot_wider(data = long_data,
+                         names_from = annual_income,
+                         values_from = freq)
+wide_data
